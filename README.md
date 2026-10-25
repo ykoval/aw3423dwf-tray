@@ -17,9 +17,6 @@ Mode codes are in [VCP_MAP.md](VCP_MAP.md). Custom Color HDR and the HDR Peak 10
 toggle are not reachable over DDC/CI and stay in the monitor's own menu. Creator always
 means Creator with the DCI-P3 color space; Creator sRGB is left to the monitor menu.
 
-The interface is in English and Russian. It follows the Windows display language;
-switch it in the tray menu under "Language / Язык".
-
 ## Compatibility and disclaimer
 
 This is an unofficial project. It is not affiliated with, endorsed by or supported by

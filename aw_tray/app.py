@@ -9,9 +9,7 @@ import winreg
 import pystray
 from PIL import Image, ImageDraw
 
-from . import i18n
 from .controller import Controller
-from .i18n import t
 from .modes import DARK_STABILIZER_LEVELS, HDR_MODES, MODEL, SDR_MODES
 from .panel import Panel
 
@@ -74,8 +72,7 @@ class App:
         self.icon = pystray.Icon(APP_NAME, _icon_image(), f"{MODEL}", menu=self._menu())
 
     def _state_changed(self, state):
-        # Look the panel up on the Tk thread: a language switch may have replaced it by then.
-        self._call(lambda: self.panel.render(state))
+        self._call(self.panel.render, state)
         self.icon.title = f"{MODEL}: {state.mode_name}" if state.mode_name else MODEL
         self.icon.update_menu()  # re-evaluates the radio checks
 
@@ -98,41 +95,25 @@ class App:
                 checked=lambda _: self.controller.state.mode_e2 == mode.e2, radio=True)
 
         # pystray picks the call signature from the argument count, so actions take none.
-        # Texts are callables so a language switch shows up on the next menu update.
         def stabilizer_item(level):
             return pystray.MenuItem(
-                lambda _: t("menu_level", level=level), lambda: self.controller.set_dark_stabilizer(level),
+                f"Level {level}", lambda: self.controller.set_dark_stabilizer(level),
                 checked=lambda _: self.controller.state.dark_stabilizer == level, radio=True)
 
-        def language_item(code, label):
-            return pystray.MenuItem(
-                label, lambda: self._call(self._set_language, code),
-                checked=lambda _: i18n.language() == code, radio=True)
-
         return pystray.Menu(
-            pystray.MenuItem(lambda _: t("menu_open"), lambda: self._call(self.panel.toggle), default=True),
+            pystray.MenuItem("Open panel", lambda: self._call(self.panel.toggle), default=True),
             pystray.Menu.SEPARATOR,
-            pystray.MenuItem(lambda _: t("mode"), pystray.Menu(*[mode_item(m) for m in SDR_MODES])),
-            pystray.MenuItem(lambda _: t("hdr_mode"), pystray.Menu(*[mode_item(m) for m in HDR_MODES])),
+            pystray.MenuItem("Mode", pystray.Menu(*[mode_item(m) for m in SDR_MODES])),
+            pystray.MenuItem("HDR mode", pystray.Menu(*[mode_item(m) for m in HDR_MODES])),
             pystray.MenuItem("Dark Stabilizer", pystray.Menu(
                 *[stabilizer_item(lv) for lv in DARK_STABILIZER_LEVELS])),
             pystray.Menu.SEPARATOR,
-            pystray.MenuItem("Language / Язык", pystray.Menu(
-                *[language_item(code, label) for code, label in i18n.LANGUAGES.items()])),
-            pystray.MenuItem(lambda _: t("menu_autostart"),
+            pystray.MenuItem("Start with Windows",
                              lambda: set_autostart(not autostart_enabled()),
                              checked=lambda _: autostart_enabled(),
                              enabled=_autostart_command() is not None),
-            pystray.MenuItem(lambda _: t("menu_quit"), self._quit),
+            pystray.MenuItem("Quit", self._quit),
         )
-
-    def _set_language(self, code):
-        i18n.set_language(code)
-        # Widget texts are fixed at creation, so the panel is rebuilt in the new language.
-        self.panel.window.destroy()
-        self.panel = Panel(self.root, self.controller)
-        self.panel.render(self.controller.state)
-        self.icon.update_menu()
 
     def _quit(self):
         self.icon.stop()

@@ -5,7 +5,6 @@ import tkinter as tk
 from ctypes import wintypes
 from tkinter import ttk
 
-from .i18n import t
 from .modes import DARK_STABILIZER_LEVELS, HDR_MODES, MODEL, SDR_MODES
 
 BG = "#202020"
@@ -88,8 +87,8 @@ class Panel:
 
         card = tk.Frame(outer, bg=CARD)
         card.pack(fill="x", padx=10, pady=4)
-        self._brightness = Slider(card, t("brightness"), controller.set_brightness)
-        self._contrast = Slider(card, t("contrast"), controller.set_contrast)
+        self._brightness = Slider(card, "Brightness", controller.set_brightness)
+        self._contrast = Slider(card, "Contrast", controller.set_contrast)
 
         # On the window background, like the mode buttons, so unselected levels stay visible.
         stabilizer = tk.Frame(outer, bg=BG)
@@ -104,7 +103,7 @@ class Panel:
             self._stabilizer_buttons[level] = button
 
         self._mode_buttons = {}
-        self._section(outer, t("mode"), SDR_MODES)
+        self._section(outer, "Mode", SDR_MODES)
 
         hdr_header = tk.Frame(outer, bg=BG)
         hdr_header.pack(fill="x", padx=14, pady=(10, 2))
@@ -191,14 +190,14 @@ class Panel:
                 self._paint(button, key == current, enabled)
         self._hdr_on = state.hdr_on
         self._hdr_button.config(
-            text=t("on") if state.hdr_on else t("off"),
+            text="On" if state.hdr_on else "Off",
             bg=ACCENT if state.hdr_on else CARD, fg=ACCENT_FG if state.hdr_on else FG,
             activebackground="#3a3a3a", activeforeground=FG,
             state="normal" if enabled and state.hdr_supported else "disabled")
         self._mode_label.config(text=state.mode_name or "")
         if state.busy:
-            self._status.config(text=t("switching", what=state.busy), fg=MUTED)
+            self._status.config(text=f"Switching: {state.busy}", fg=MUTED)
         elif state.message:
             self._status.config(text=state.message, fg=WARN)
         else:
-            self._status.config(text=t("hdr_hint"), fg=MUTED)
+            self._status.config(text="HDR modes turn Windows HDR on by themselves", fg=MUTED)
