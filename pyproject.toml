@@ -1,6 +1,6 @@
 [project]
 name = "aw-monitor-tray"
-version = "0.1.0"
+version = "0.2.0"
 description = "Tray app for the Alienware AW3423DWF: brightness, presets, HDR and Dark Stabilizer over DDC/CI"
 readme = "README.md"
 requires-python = ">=3.12"

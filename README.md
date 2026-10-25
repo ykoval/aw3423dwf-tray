@@ -1,5 +1,8 @@
 # aw3423dwf-tray
 
+[![Latest release](https://img.shields.io/github/v/release/ykoval/aw3423dwf-tray?label=download)](https://github.com/ykoval/aw3423dwf-tray/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A tray app that replaces the quick menu of the old Dell Display Manager for the
 Alienware AW3423DWF. It talks to the monitor directly over DDC/CI, so it works
 alongside Dell Display and Peripheral Manager (DDPM) without depending on it.
@@ -32,6 +35,18 @@ For another monitor, `tools/probe_vcp.py watch` shows which codes change while y
 switch modes from the monitor's menu; `modes.py` and `VCP_MAP.md` are the places to
 record what you find.
 
+## Install
+
+1. Download `AWMonitorTray-<version>-win64.zip` from the
+   [latest release](https://github.com/ykoval/aw3423dwf-tray/releases/latest) and unpack it,
+   for example to `%LOCALAPPDATA%\Programs\AWMonitorTray`.
+2. Run `AWMonitorTray.exe`. The icon appears near the clock; it may be hidden under the ^ arrow.
+3. Right click the icon → "Start with Windows" to start it with Windows.
+
+DDC/CI has to be on in the monitor's menu (it is by default). The exe is not code-signed,
+so Windows SmartScreen may warn on first launch; each release lists the SHA-256 of its zip.
+To update, quit the running copy (right click → Quit), replace the folder and start it again.
+
 ## Run from source
 
 Quit the installed copy first (tray menu → Quit): only one instance runs at a time.
@@ -41,7 +56,7 @@ uv sync
 uv run python -m aw_tray
 ```
 
-## Build and install
+## Build from source
 
 ```
 uv run python -c "from aw_tray.app import _icon_image; _icon_image().save('icon.ico', sizes=[(16,16),(24,24),(32,32),(48,48),(64,64)])"
