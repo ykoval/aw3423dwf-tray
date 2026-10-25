@@ -5,6 +5,8 @@ Each mode is switched by writing `value` to VCP `code`; the monitor then reports
 """
 from dataclasses import dataclass
 
+from .i18n import t
+
 MODEL = "AW3423DWF"
 
 VCP_BRIGHTNESS = 0x10
@@ -62,4 +64,4 @@ _BY_E2 = {m.e2: m.name for m in SDR_MODES + HDR_MODES}
 def name_for(e2):
     if e2 is None:
         return None
-    return _BY_E2.get(e2) or _DISPLAY_ONLY.get(e2) or f"неизвестный ({e2})"
+    return _BY_E2.get(e2) or _DISPLAY_ONLY.get(e2) or t("unknown_mode", value=e2)

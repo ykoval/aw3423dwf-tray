@@ -17,7 +17,8 @@ Mode codes are in [VCP_MAP.md](VCP_MAP.md). Custom Color HDR and the HDR Peak 10
 toggle are not reachable over DDC/CI and stay in the monitor's own menu. Creator always
 means Creator with the DCI-P3 color space; Creator sRGB is left to the monitor menu.
 
-The interface is in Russian.
+The interface is in English and Russian. It follows the Windows display language;
+switch it in the tray menu under "Language / Язык".
 
 ## Compatibility and disclaimer
 
@@ -36,7 +37,7 @@ record what you find.
 
 ## Run from source
 
-Quit the installed copy first (tray menu → Выход): only one instance runs at a time.
+Quit the installed copy first (tray menu → Quit): only one instance runs at a time.
 
 ```
 uv sync
@@ -51,7 +52,7 @@ uv run pyinstaller --noconfirm --clean --onedir --windowed --name AWMonitorTray 
 ```
 
 Copy `dist\AWMonitorTray` to `%LOCALAPPDATA%\Programs\AWMonitorTray` and turn on
-"Запускать при входе в Windows" in the tray menu.
+"Start with Windows" in the tray menu.
 
 ## Tools
 

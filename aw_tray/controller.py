@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 
 from . import hdr
 from .ddc import Monitor
+from .i18n import t
 from .modes import (DARK_STABILIZER_BASE, DARK_STABILIZER_LEVELS, DARK_STABILIZER_QUERY, MODEL,
                     VCP_BRIGHTNESS, VCP_CONTRAST, VCP_DELL_COMMAND, VCP_HDR_ACTIVE, VCP_MODE,
                     name_for)
@@ -77,12 +78,12 @@ class Controller:
             try:
                 getattr(self, "_do_" + job[0])(*job[1:])
             except Exception as exc:  # keep the worker alive whatever happens
-                self._publish(busy=None, message=f"Ошибка: {exc}")
+                self._publish(busy=None, message=t("error", error=exc))
 
     def _do_refresh(self):
         if not self._monitor.available():
             self._publish(available=False, busy=None,
-                          message="Монитор не отвечает по DDC/CI (удалённый сеанс или монитор выключен)")
+                          message=t("no_ddc"))
             return
         hdr_state = hdr.get_state(MODEL) or (False, False)
         self._publish(
@@ -113,7 +114,7 @@ class Controller:
         time.sleep(0.5)
         got = self._read_dark_stabilizer()
         self._publish(dark_stabilizer=got, busy=None, message=None if got == level else
-                      f"Монитор не подтвердил Dark Stabilizer {level}")
+                      t("stabilizer_not_confirmed", level=level))
 
     def _do_slider(self, code):
         time.sleep(0.08)  # let a dragging slider settle so only the last value is sent
@@ -123,7 +124,7 @@ class Controller:
             return
         ok = self._monitor.set(code, value)
         field = "brightness" if code == VCP_BRIGHTNESS else "contrast"
-        self._publish(**{field: value}, message=None if ok else "Монитор не принял значение")
+        self._publish(**{field: value}, message=None if ok else t("value_rejected"))
 
     def _wait_for(self, code, expected, timeout):
         deadline = time.time() + timeout
@@ -143,20 +144,20 @@ class Controller:
         return ready
 
     def _do_hdr(self, enabled):
-        self._publish(busy="HDR вкл…" if enabled else "HDR выкл…", message=None)
+        self._publish(busy=t("hdr_turning_on") if enabled else t("hdr_turning_off"), message=None)
         ok = self._switch_hdr(enabled)
         self._do_refresh()
-        self._publish(busy=None, message=None if ok else "Не удалось переключить HDR")
+        self._publish(busy=None, message=None if ok else t("hdr_failed"))
 
     def _do_mode(self, mode):
         self._publish(busy=mode.name, message=None)
         current_hdr = (hdr.get_state(MODEL) or (False, False))[1]
         if mode.hdr != current_hdr and not self._switch_hdr(mode.hdr):
             self._do_refresh()
-            self._publish(busy=None, message="Не удалось переключить HDR")
+            self._publish(busy=None, message=t("hdr_failed"))
             return
         self._monitor.set(mode.code, mode.value)
         confirmed = self._wait_for(VCP_MODE, mode.e2, timeout=6)
         self._do_refresh()  # brightness and contrast are stored per mode
         self._publish(busy=None, message=None if confirmed else
-                      f"Монитор не подтвердил режим {mode.name}: сейчас {self.state.mode_name}")
+                      t("mode_not_confirmed", mode=mode.name, current=self.state.mode_name))
