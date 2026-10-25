@@ -1,0 +1,15 @@
+[project]
+name = "aw-monitor-tray"
+version = "0.1.0"
+description = "Tray app for the Alienware AW3423DWF: brightness, presets, HDR and Dark Stabilizer over DDC/CI"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=13.0.0",
+    "pystray>=0.19.5",
+]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+]
